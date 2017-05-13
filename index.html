@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .chart div {
+        font: 10px sans-serif;
+        background-color: steelblue;
+        text-align: right;
+        padding: 3px;
+        float: left;
+        margin: 1px;
+        color: white;
+    }
+
+    .bar {
+        fill: steelblue;
+    }
+
+    .bar:hover {
+        fill: aqua;
+    }
+
+    .axis--x path {
+        display: none;
+    }
+
+</style>
+<svg id="pieChart" width="320" height="320"></svg>
+<script src="//d3js.org/d3.v4.min.js"></script>
+
+<script>
+
+    var arc = d3.arc()
+        .innerRadius(50)
+        .outerRadius(100)
+        .startAngle(function(d, i){ return myScale(d)})
+        .endAngle(Math.PI / 2);
+
+    var myScale = d3.scaleLinear().range([0, Math.PI * 2]).domain([0, 1]);
+
+    console.log(myScale(.5) + "yo");
+
+    var svg = d3.select("#pieChart");
+
+    d3.tsv("data.tsv", function (error, data) {
+
+    })
+
+    svg.selectAll("path").data(data).enter()
+        .append("path")
+        .attr("d", arc)
+        .attr("transform", "translate(160, 160)");
+
+    //get data
+   /* d3.tsv("data.tsv", function(d) {
+        d.frequency = +d.frequency;
+        return d;
+    }, function(error, data) {
+        if (error) throw error;
+
+        svg1.selectAll(".arcPart")
+            .data(data)
+            .enter().append()
+
+    });*/
+
+    //define new element
+
+    //draw data
+
+
+
+</script>
+
+<!--
+Assignment: For this assignment you can select a difficulty depending on how comfortable you feel about D3.js so far.
+The grade will be a pass of fail: handing in a working web file will give you a pass.
+● Easy: ​Make a new HTML files using the example, invert the x and y axis and edit the style of the bar chart (colors, size).
+● Medium:​ Edit the bar chart and add loading animations and labels with information when hovering a bar with the mouse
+● Hard:​ Build an entirely different type of visualization using the same dataset (pie chart, bubble chart, scatter plot, …)
+-->
