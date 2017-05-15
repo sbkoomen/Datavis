@@ -2,8 +2,6 @@
 <meta charset="utf-8">
 <style>
 
-
-
     .arc text {
         font: 10px sans-serif;
         text-anchor: middle;
@@ -13,32 +11,8 @@
         stroke: #fff;
     }
 
-
-
-    .chart div {
-        font: 10px sans-serif;
-        background-color: steelblue;
-        text-align: right;
-        padding: 3px;
-        float: left;
-        margin: 1px;
-        color: white;
-    }
-
-    .bar {
-        fill: steelblue;
-    }
-
-    .bar:hover {
-        fill: aqua;
-    }
-
-    .axis--x path {
-        display: none;
-    }
-
 </style>
-<svg width="960" height="500"></svg>
+<svg width="720" height="720"></svg>
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script>
 
@@ -48,10 +22,12 @@
             radius = Math.min(width, height) / 2,
             g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-    var color = d3.scaleOrdinal(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
-
-
     var colorScale = d3.scaleLinear().range([0,360]);
+
+    function getColor(index) {
+        console.log(index + " scaled is" + colorScale(index));
+        return d3.hsl(colorScale(index), 0.9, 0.5);
+    }
 
 
     var pie = d3.pie()
@@ -60,11 +36,11 @@
 
     var path = d3.arc()
             .outerRadius(radius - 10)
-            .innerRadius(0);
+            .innerRadius(radius - 100);
 
     var label = d3.arc()
-            .outerRadius(radius - 40)
-            .innerRadius(radius - 40);
+            .outerRadius(radius - 10)
+            .innerRadius(radius - 100);
 
     d3.tsv("data.tsv", function(d) {
         d.frequency = +d.frequency;
@@ -81,72 +57,13 @@
 
         arc.append("path")
                 .attr("d", path)
-                .attr("fill", d3.hsl(function(d) {
-                    console.log("plz");
-/*
-                    console.log( " is the current object, which should get h value" + colorScale(i));
-*/
-
-                    return colorScale(d);}, 50, 0.5));
-
-        for (var i = 0; i < 27; i++) {
-            console.log(colorScale(i));
-
-        }
-
-
-/*
-        .attr("fill", d3.hsl(function(d) {return colorScale(d);}, 100, 100));
-*/
-
+                .attr("fill", function (d, i) { return getColor(i);});
 
         arc.append("text")
                 .attr("transform", function(d) { return "translate(" + label.centroid(d) + ")"; })
                 .attr("dy", "0.35em")
                 .text(function(d) { return d.data.letter; });
     });
-
-
-
-    /*var arc = d3.arc()
-        .innerRadius(50)
-        .outerRadius(100)
-        .startAngle(function(d, i){ return myScale(d)})
-        .endAngle(Math.PI / 2);
-
-    var myScale = d3.scaleLinear().range([0, Math.PI * 2]).domain([0, 1]);
-
-    console.log(myScale(.5) + "yo");
-
-    var svg = d3.select("#pieChart");
-
-    d3.tsv("data.tsv", function (error, data) {
-
-    })
-
-    svg.selectAll("path").data(data).enter()
-        .append("path")
-        .attr("d", arc)
-        .attr("transform", "translate(160, 160)");*/
-
-    //get data
-   /* d3.tsv("data.tsv", function(d) {
-        d.frequency = +d.frequency;
-        return d;
-    }, function(error, data) {
-        if (error) throw error;
-
-        svg1.selectAll(".arcPart")
-            .data(data)
-            .enter().append()
-
-    });*/
-
-    //define new element
-
-    //draw data
-
-
 
 </script>
 
