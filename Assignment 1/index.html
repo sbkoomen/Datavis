@@ -30,9 +30,11 @@
     }
 
 
-    var pie = d3.pie()
-            .sort(null)
-            .value(function(d) { return d.frequency; });
+
+    var pie = d3.pie();
+
+    pie.sortValues(function(a, b) { return b - a ;})
+        .value(function(d) { return d.frequency; });
 
     var path = d3.arc()
             .outerRadius(radius - 10)
