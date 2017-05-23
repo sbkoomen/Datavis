@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script src="three.js"></script>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script>
+
+
+    var camera, scene, renderer;
+
+    var cubeHeight = 11;
+    var cubeWidth = 11;
+    var cubeDepth = 11;
+
+    var vertexDistance = 10;
+
+    var particles = new THREE.Geometry(),
+        pMaterial = new THREE.PointsMaterial({
+            color: 0xFFFFFF,
+            size: 2
+        })
+
+    for (var xI = 0; xI < cubeWidth; xI++) {
+        for (var yI = 0; yI < cubeHeight; yI++) {
+            for (var zI = 0; zI < cubeDepth; zI++) {
+
+                var pX = function (xI) {
+                        return xI * vertexDistance - ((cubeWidth * vertexDistance) / 2);
+                    },
+                    pY = function (yI) {
+                        return yI * vertexDistance - ((cubeHeight * vertexDistance) / 2);
+                    },
+                    pZ = function (zI) {
+                        return zI * vertexDistance - ((cubeDepth * vertexDistance) / 2);
+                    };
+
+                var particle = new THREE.Vector3(pX(xI), pY(yI), pZ(zI));
+
+                particles.vertices.push(particle);
+            }
+        }
+    }
+
+    var particleSystem = new THREE.Points(particles, pMaterial);
+    particleSystem.geometry.dynamic = true;
+
+
+    camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 10000);
+    camera.position.z = 400;
+
+    scene = new THREE.Scene();
+    scene.add(particleSystem);
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(1);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    var timeDiff = new Date().getTime();
+
+
+    animate();
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        camera.position.z += 0.5;
+
+
+        particleSystem.rotateX((new Date().getTime() - timeDiff) / 1000);
+
+        timeDiff = new Date().getTime();
+
+        camera.lookAt(particleSystem.position);
+
+
+        updateParticles();
+
+        renderer.render(scene, camera);
+    }
+
+    function updateParticles() {
+
+        vertexDistance = vertexDistance;
+
+        var count = 0;
+        for (var xI = 0; xI < cubeWidth; xI++) {
+            for (var yI = 0; yI < cubeHeight; yI++) {
+                for (var zI = 0; zI < cubeDepth; zI++) {
+
+                    var pX = function (xI) {
+                            return xI * vertexDistance - ((cubeWidth * vertexDistance) / 2);
+                        },
+                        pY = function (yI) {
+                            return yI * vertexDistance - ((cubeHeight * vertexDistance) / 2);
+                        },
+                        pZ = function (zI) {
+                            return zI * vertexDistance - ((cubeDepth * vertexDistance) / 2);
+                        };
+
+                    var particle = particles.vertices[count];
+
+                    particle.z = pZ(zI);
+                    particle.x = pX(xI);
+                    particle.y = pY(yI);
+
+
+
+                    count++;
+
+                }
+            }
+            console.log(pX(xI));
+            particles.verticesNeedUpdate = true;
+
+        }
+
+    }
+
+</script>
+
+
+</body>
+</html>
