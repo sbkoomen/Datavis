@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<script>
+
+    var flightDataSet = [];
+
+   d3.csv("routes.csv", function (data) {
+        flightDataSet = data;
+        console.log(flightDataSet);
+
+    })
+
+
+
+</script>
+
+</body>
+</html>

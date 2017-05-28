@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>InterMediate Assignment</title>
+</head>
+<body>
+
+<svg width="960" height="720" id="bubbleGraph"></svg>
+
+<ul id="mostplayedlist">
+
+</ul>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<script>
+
+    var packWidth = 960;
+    var packHeight = 720;
+
+    var bubbleGraph = d3.select("#bubbleGraph").attr("width", packWidth).attr("height", packHeight);
+
+    var bubbleScale = d3.scaleLinear().range([0, 10]);
+
+    d3.tsv("top40.tsv", function (error, data) {
+
+
+        bubbleScale.domain(
+            [0, d3.max(data, function (d) {
+                return d["DJ Play Count"]
+            })]
+        );
+
+
+        //sort the data.
+        data.sort(function (a, b) {
+            return (+b["DJ Play Count"] - +a["DJ Play Count"]);
+        });
+
+
+
+        makeList(data);
+
+        createBubbles(data);
+    });
+
+    function makeList(data) {
+        var list = d3.select("#mostplayedlist").selectAll(".listItem").data(data);
+
+        list.enter().append("li")
+            .attr("class", "listItem")
+            .text(function (d) {
+                    return d["Track Title"] + " played this many times: " + d["DJ Play Count"];
+                }
+            );
+        list.exit().remove();
+    }
+
+    function createBubbles(data) {
+
+        var selection = d3.hierarchy(data).sum(function (d) {
+            return +d["DJ Play Count"];
+        });
+
+
+
+        var pack = d3.pack().size(packWidth, packHeight);
+
+        pack(selection);
+
+        console.log(selection);
+        var bubbles = d3.select("#bubbleGraph").selectAll(".bubble").data(data)
+            .enter().append("circle").attr('r', 30);
+
+        /*bubbles.enter().append("circle")
+            .attr("r", function (d) {
+                return d.r;
+            })
+            .attr("cy", function (d) {
+                return d.y;
+            })
+            .attr("cx", function (d) {
+                return d.x;
+            })
+            .attr("class", "bubble");*/
+    }
+
+</script>
+
+
+</body>
+</html>
