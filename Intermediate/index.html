@@ -8,9 +8,6 @@
 
 <svg width="960" height="720" id="bubbleGraph"></svg>
 
-<input type="range" id = "bpmSlider" onchange="changeBpm()">
-
-
 <ul id="mostplayedlist">
 
 </ul>
@@ -46,7 +43,7 @@
 
         makeList(data);
 
-        createBubbles(data, 200);
+        createBubbles(data, 200, '2013');
     });
 
     function refreshData() {
@@ -78,12 +75,11 @@
         list.exit().remove();
     }
 
-    function createBubbles(data, maxBpm) {
+    function createBubbles(data, maxBpm, year) {
 
         var newData = {name: "root", children: data};
 
         var hierarchy = d3.hierarchy(newData).sum(function (d) {return d.dj_play_count;});
-
 
         console.log(hierarchy);
 
@@ -91,12 +87,15 @@
 
         pack(hierarchy);
 
+        console.log()
+
+        var t = d3.transition().duration(5000).ease(d3.easeLinear);
+
         var bubbles = d3.select("#bubbleGraph").selectAll(".bubble").data(hierarchy.leaves())
             .enter()
+            .filter(function (d) {return d.data.year === year; })
             .append("circle")
-            .attr("r", function (d) {
-                return d.r;
-            })
+
             .attr("cy", function (d) {
                 return d.y;
             })
@@ -104,6 +103,10 @@
                 return d.x;
             })
             .attr("class", "bubble")
+            .transition(t)
+            .attr("r", function (d) {
+                return d.r;
+            })
             .append("svg:title").text(function (d) {return d.data.title;});
 
         bubbles.exit().remove();
