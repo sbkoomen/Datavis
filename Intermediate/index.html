@@ -4,9 +4,12 @@
     <meta charset="UTF-8">
     <title>InterMediate Assignment</title>
 </head>
-<body>
+<>
 
 <svg width="960" height="720" id="bubbleGraph"></svg>
+
+<input type="range" id = "bpmSlider" onchange="changeBpm()">
+
 
 <ul id="mostplayedlist">
 
@@ -16,6 +19,7 @@
 
 <script>
 
+    var savedData;
     var packWidth = 960;
     var packHeight = 720;
 
@@ -23,27 +27,44 @@
 
     var bubbleScale = d3.scaleLinear().range([0, 10]);
 
-    d3.tsv("top40.tsv", function (error, data) {
+    var bpmScale = d3.scaleLinear().range([0, 200]).domain([0, 100]);
 
+    d3.csv("top40.csv", function (error, data) {
+
+        savedData = data;
 
         bubbleScale.domain(
             [0, d3.max(data, function (d) {
-                return d["DJ Play Count"]
+                return d["dj_play_count"]
             })]
         );
 
-
         //sort the data.
         data.sort(function (a, b) {
-            return (+b["DJ Play Count"] - +a["DJ Play Count"]);
+            return (+b.dj_play_count - +a.dj_play_count);
         });
-
-
 
         makeList(data);
 
-        createBubbles(data);
+        createBubbles(data, 200);
     });
+
+    function refreshData() {
+        d3.csv("top40.csv", function (error, data) {
+            if (error) { return;}
+            savedData = data;
+            return data;
+        });
+    }
+
+    function changeBpm() {
+        var currentBpm = d3.select("#bpmSlider").property("value");
+        console.log(bpmScale(currentBpm));
+        console.log(savedData);
+
+        //redrawBubbles
+        createBubbles(savedData, bpmScale(currentBpm));
+    }
 
     function makeList(data) {
         var list = d3.select("#mostplayedlist").selectAll(".listItem").data(data);
@@ -51,29 +72,28 @@
         list.enter().append("li")
             .attr("class", "listItem")
             .text(function (d) {
-                    return d["Track Title"] + " played this many times: " + d["DJ Play Count"];
+                    return d.title + " played this many times: " + d.dj_play_count;
                 }
             );
         list.exit().remove();
     }
 
-    function createBubbles(data) {
+    function createBubbles(data, maxBpm) {
 
-        var selection = d3.hierarchy(data).sum(function (d) {
-            return +d["DJ Play Count"];
-        });
+        var newData = {name: "root", children: data};
+
+        var hierarchy = d3.hierarchy(newData).sum(function (d) {return d.dj_play_count;});
 
 
+        console.log(hierarchy);
 
-        var pack = d3.pack().size(packWidth, packHeight);
+        var pack = d3.pack().size([packWidth, packHeight]);
 
-        pack(selection);
+        pack(hierarchy);
 
-        console.log(selection);
-        var bubbles = d3.select("#bubbleGraph").selectAll(".bubble").data(data)
-            .enter().append("circle").attr('r', 30);
-
-        /*bubbles.enter().append("circle")
+        var bubbles = d3.select("#bubbleGraph").selectAll(".bubble").data(hierarchy.leaves())
+            .enter()
+            .append("circle")
             .attr("r", function (d) {
                 return d.r;
             })
@@ -83,7 +103,10 @@
             .attr("cx", function (d) {
                 return d.x;
             })
-            .attr("class", "bubble");*/
+            .attr("class", "bubble")
+            .append("svg:title").text(function (d) {return d.data.title;});
+
+        bubbles.exit().remove();
     }
 
 </script>

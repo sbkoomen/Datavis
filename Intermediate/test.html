@@ -25,15 +25,21 @@
     d3.json("flare.json", function(error, data) {
         if (error) throw error;
 
-        var root = d3.hierarchy(classes(data))
+        var wtf = classes(data);
+
+        console.log(wtf);
+
+
+        var root = d3.hierarchy(stratify(data))
             .sum(function(d) { return d.value; })
             .sort(function(a, b) { return b.value - a.value; });
 
-        console.log(data);
-        console.log(root);
+        //console.log(data);
+        //console.log(root);
         bubble(root);
 
         console.log(root);
+
         var node = svg.selectAll(".node")
             .data(root.children)
             .enter().append("g")
